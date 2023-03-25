@@ -6,7 +6,7 @@ conv_handler = ConversationHandler(
     entry_points=[CommandHandler("start", start)],
     states={
         BEGIN: [MessageHandler(Filters.text & ~Filters.command, get_begin)],
-        # GAME: [MessageHandler(Filters.text & ~Filters.command, get_game)]
+        GAME: [MessageHandler(Filters.text & ~Filters.command, get_game)]
     },
     fallbacks=[CommandHandler("end", end)]
 )
