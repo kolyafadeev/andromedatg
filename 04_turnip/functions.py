@@ -54,4 +54,5 @@ def  get_game(update: Update, context: CallbackContext):
         answer += f"{nom} за {acc}."
     answer += "Тянут - потянут - вытянуть не могу. Кого позовем еще?"
     update.message.reply_text(f'{answer}')
+    
 
