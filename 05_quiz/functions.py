@@ -1,10 +1,12 @@
-import csv
+import csv, random
 from telegram.ext import CallbackContext, ConversationHandler
 from telegram import (Update, ReplyKeyboardMarkup, ReplyKeyboardRemove)
 
 
 GO = "LETS GO"
 GAME = 1
+QUESTIONS_ON_ROUND = 4
+
 
 
 def read_csv():
@@ -33,13 +35,31 @@ def start(update: Update, context: CallbackContext):
         "Добро пожаловать в викторину😃")
     update.message.reply_text(
         f"Чтобы начать, нажми на '{GO}'", reply_markup=keyboard)
+    questions = read_csv()
+    random.shuffle(questions)
+
+    questions = questions[:QUESTIONS_ON_ROUND]
+    context.user_data["вопросы"] = questions
+    context.user_data['right_ansver'] = GO
     return GAME
 
 
 def game(update: Update, context: CallbackContext):
-    update.message.reply_text(
-        "Игра началась ОХОХОХОО"
-    )
+    questions = context.user_data["вопросы"]
+    answers = questions.pop()
+    question_text = answers.pop(0)
+    right_ansver = answers[0]
+    random.shuffle(answers)
+    mark_up = [answers[:2], answers[2:]]
+    keyboard = ReplyKeyboardMarkup(  
+        keyboard=mark_up,
+        resize_keyboard=True,  
+        one_time_keyboard=True,
+        )
+
+    update.message.reply_text(question_text, reply_markup=keyboard)
+
+
 
 
 def end(update: Update, context: CallbackContext):

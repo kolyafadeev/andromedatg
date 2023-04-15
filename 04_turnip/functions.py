@@ -18,10 +18,7 @@ def start(update: Update, context: CallbackContext):
     )
 
     update.message.reply_text(
-        f"""
-        Ты любишь придумывать сказки? Я очень люблю.
-        Ты знаешь сказку как посадил дед репку?
-        А кто помогал деду репку тянуть? Чтобы начать, нажми на кнопку {GO}!""",
+        f""" Ты любишь придумывать сказки? Я очень люблю. Ты знаешь сказку как посадил дед репку? А кто помогал деду репку тянуть? Чтобы начать, нажми на кнопку {GO}!""",
         reply_markup=keyboard)
     return BEGIN
 
@@ -29,11 +26,7 @@ def start(update: Update, context: CallbackContext):
 def get_begin(update: Update, context: CallbackContext):
     heroes = [["дедку"], ["дедка", "репку"]]
     context.user_data["heroes"] = heroes
-    update.message.reply_text("""
-    Посадил дед репку. Выросла репка большая-пребольшая.
-    Стал дед репку из земли тянуть.
-    Тянет-потянет - вытянуть не может.
-    Кого позвал дедка?""", reply_markup=ReplyKeyboardRemove())
+    update.message.reply_text(""" Посадил дед репку. Выросла репка большая-пребольшая. Стал дед репку из земли тянуть. Тянет-потянет - вытянуть не может. Кого позвал дедка?""", reply_markup=ReplyKeyboardRemove())
     return GAME
 
 def end(update: Update, context: CallbackContext):
@@ -42,17 +35,25 @@ def end(update: Update, context: CallbackContext):
 
 def  get_game(update: Update, context: CallbackContext):
     text = update.message.text
-    word = morph.parse(text)[0]
-    nomn = word.inflect({"nomn"}).word
-    accs = word.inflect({"accs"}).word
-    update.message.reply_text(f"{nomn}, {accs}")
-    heroes = context.user_data["heroes"] # из рюкзака достаем героев 
-    heroes[0].insert(0, nomn) # [бабка, дедку]
-    heroes.insert(0, [accs])
-    answer = f"Я {nomn}.Буду помогать. "
-    for nom, acc in heroes [1:]:
-        answer += f"{nom} за {acc}."
-    answer += "Тянут - потянут - вытянуть не могу. Кого позовем еще?"
-    update.message.reply_text(f'{answer}')
+    word = morph.parse(text)[0] #ТЕГ 
+    if word.tag.animacy == "anim":
+        nomn = word.inflect({"nomn"}).word #ИМЕНИТЕЛЬНЫЙ ПАДЕЖ
+        accs = word.inflect({"accs"}).word #ВИНИТЕЛЬНЫЙ ПАДЕЖ
+        # update.message.reply_text(f"{nomn}, {accs}")
+        heroes = context.user_data["heroes"] # из рюкзака достаем героев 
+        heroes[0].insert(0, nomn) # [бабка, дедку]
+        heroes.insert(0, [accs])
+        answer = f"Я {nomn}.Буду помогать. "
+        for nom, acc in heroes [1:]:
+            answer += f"{nom} за {acc}."
+        if "мыш" in nomn:
+            answer += "Тянут потянут - вытянули репку"
+            update.message.reply_text(f'{answer}')
+            return ConversationHandler.END
+
+        answer += "Тянут - потянут - вытянуть не могу. Кого позовем еще?"
+        update.message.reply_text(f'{answer}')
+    else:
+        update.message.reply_text(f"Долго искали мы {word.normal_form}: ничего не нашли")
     
 
